@@ -39,3 +39,5 @@ Public key cryptography is part of the proposed solution. In the given example, 
 
 The second part of the proposed solution is to use SHA-3 which is implemented using a sponge construction rather than a message digest. In the given example, SHAKE-256 is used because it allows arbitrary length hashes to be generated. In this case, a one-time, pre-shared private key can be derived in secret by absorbing the Diffie-Hellman public key, and squeezing out a hash of the desired message length.
 
+_**privateKey = shake(publicKey, length)**_
+

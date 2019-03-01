@@ -1,43 +1,79 @@
 # Hush Cipher
 
-| Key           | Value                                             |
-| ------------- | ------------------------------------------------- |
-| Author        | Matthew Layton                                    |
-| Date          | February 28th, 2019                               |
-| Alma mater    | University of Bedfordshire (BSc Computer Science) |
-| Email address | matthew.layton@live.co.uk                         |
+The Hush cipher is an adaptation of the Vernam cipher which proposes to solve the existing problem of securely and efficiently distributing a one-time, pre-shared key using public key cryptography. Specifically, the Hush cipher employs a combination of Diffie-Hellman key exchange and the SHA-3 Shake-256 hash algorithm to generate secure symmetric keys of arbitrary length.
 
-The Hush cipher is an attempt to solve the existing problems of key exchange when using the Vernam cipher, using a combination of Diffie-Hellman key exchange and SHA-3 Shake 256 to generate secure, arbitrary length symmetric keys.
+## One-Time Pad
 
-## One-Time-Pad & Vernam Ciphers
-
-In cryptography, the one-time pad (OTP) is an encryption technique that has been mathematically proven to be 100% uncrackable, but requires the use of a one-time pre-shared key the same size as, or longer than the message being sent. 
+In cryptography, the one-time pad (OTP) is an encryption technique that has been mathematically proven to be 100% uncrackable, but requires the use of a one-time, pre-shared key the same size as, or longer than the message being sent.
 
 In this technique a plaintext is paired with a random secret key (also referred to as a _one-time_ pad). Then each bit or character of the plaintext is encrypted by combining it with the corresponding bit or character from the pad using modular addition. 
 
 If the key is truly random, at least as long as the plaintext, never reused in whole or part, and kept completely secret, then it is impossible to decrypt or break. 
 
-A patented version of the one-time pad called the Vernam cipher uses XOR operations over each plaintext and pad bit or character.
+### Vernam Cipher
 
-## Problems
+A Vernam cipher is a symmetrical stream cipher in which the plaintext is combined with a random stream of data (or "keystream") of at least the same length, to generate a ciphertext using the Boolean "exclusive or" (XOR) function, denoted with the symbol **⊕**.
 
-Despite the proof of its security, the one-time pad suffers some serious drawbacks in practice because it requires:
+The cipher is reciprocal in that the identical keystream is used both to encipher plaintext to ciphertext and decipher ciphertext to plaintext.
 
-- Truly random, as opposed to pseudo-random, one-time pad values, which is a non-trivial requirement.
-- Secure generation and exchange of one-time pad values, which must be at least as long as the message. The security of the one-time pad is only as secure as the exchange of the pre-shared key.
-- Careful treatment to make sure that the one-time pad values continue to remain secret, and are disposed of correctly, preventing any reuse in whole or part - hence "one time".
+Encipher: _**C = P ⊕ K**_
 
-One-time pads solve few current practical problems in cryptography. High quality ciphers are widely available and their security is not considered a major worry at present. Such ciphers are almost always easier to employ than one-time pads; the amount of key material that must be properly generated and securely distributed is far smaller, and public key cryptography overcomes this problem.
+Decipher: _**P = C ⊕ K**_
 
-Quantum computers have been shown by Peter Shor and others to be much faster at solving some of the difficult problems that grant asymmetric encryption its security. If quantum computers are built with enough qubits, and overcoming some limitations to error-correction; traditional public key cryptography will become obsolete. One-time pads, however, will remain secure. See quantum cryptography and post-quantum cryptography for further discussion of the ramifications of quantum computers to information security.
+### Problems
 
-## Solution
+Despite the proof of its security, the one-time pad suffers some serious drawbacks in practice for the following reasons:
 
-As suggested, public key cryptography overcomes the problem of how much key material is required to be securely distributed in contrast to securely distributing a one-time, pre-shared private key.
+- One-time pad values must be truly random as opposed to pseudorandom.
+- One-time pad values must be securely generated, shared and at least as long as the plaintext.
+- One-time pad values must remain secret, used once and disposed of correctly.
 
-Public key cryptography is part of the proposed solution. In the given example, Diffie-Hellman key exchange is used to exchange public keys, however this only solves half of the problem, since Diffie-Hellman public keys are unlikely to be long enough to use as one-time, pre-shared private keys.
+One-time pads solve few practical problems in cryptography since other high quality ciphers are available whose security is not considered a major worry at present. such ciphers are almost always easier to employ than one-time pads since the amount of key material that must be properly generated and securely distributed is far smaller, and public key cryptography overcomes this problem.
 
-The second part of the proposed solution is to use SHA-3 which is implemented using a sponge construction rather than a message digest. In the given example, SHAKE-256 is used because it allows arbitrary length hashes to be generated. In this case, a one-time, pre-shared private key can be derived in secret by absorbing the Diffie-Hellman public key, and squeezing out a hash of the desired message length.
+### Quantum Considerations
 
-_**privateKey = shake(publicKey, length)**_
+In terms of classical computers, the difficult problems that grant asymmetric encryption its security are not considered a major worry, however quantum computers have demonstrated that these problems become trivial, and a quantum computer with enough qubits would render traditional public key cryptography obsolete. In contrast, one-time pads remain secure in post-quantum computing.
 
+## Diffie-Hellman
+
+Diffie-Hellman key exchange is a method of securely exchanging cryptographic keys over a public channel and is one of the earliest practical examples of public key exchange implemented within the field of cryptography. Traditionally, secure encrypted communication between two parties required key exchange by some private, secure channel. 
+
+The Diffie-Hellman key exchange method allows two parties to have no prior knowledge of each other to jointly establish a shared secret key over an insecure channel. The key can then be used to encrypt subsequent communications using a symmetric key cipher.
+
+## SHA-3
+
+SHA-3 is a member of the Secure Hash Algorithm family of standards released by NIST. Whilst being part of the same family on standards, SHA-3's internal implementation is vastly different from other hash algorithm implementations such as MD5, SHA-1 and SHA-2.
+
+SHA-3 is part of a broader cryptographic family, Keccak, which implements an approach known as "sponge construction" as opposed to more traditional "message digest" constructions used in MD5 and other SHA implementations.
+
+Keccak's sponge construction allows any length of data to be input (or "absorbed" in sponge terminology) and can output (or "squeeze") any amount of data using a random permutation function. One of the unique features of the SHA-3 implementation known as SHAKE-128 or SHAKE-256 allows the generation of arbitrary length hashes.
+
+## Proposal
+
+The proposed solution uses a combination of a one-time pad (specifically a Vernam cipher), Diffie-Hellman key exchange and SHA-3 (specifically SHAKE-256).
+
+Fundamentally, the proposed solution does not alter the implementation of the Vernam cipher, rather it aims to address the problem of efficiently creating and distributing a one-time pad using public key cryptography.
+
+### Scenario
+
+Alice wants to send a private message to Bob over a public channel. _Assume that this message is 1KB (or 1024 bytes) long._
+
+**Key Exchange (Diffie-Hellman)**
+
+1. Alice generates a public key and sends it to Bob.
+2. Bob generates a public key and sends it to Alice.
+3. Both Alice and Bob derive a common secret.
+
+**Encryption (SHAKE-256 & Vernam cipher)**
+
+4. Alice hashes the common secret, producing a 1024 byte long hash. _**K = hf(s, l)**_
+5. Alice enciphers the plaintext message using the hashed common secret as a one-time pad. _**C = P ⊕ K**_
+6. Alice sends the ciphertext to Bob over a public channel.
+7. Alice destroys the common secret and one-time pad.
+
+**Decryption (SHAKE-256 & Vernam cipher)**
+
+8. Bob receives the ciphertext.
+9. Bob hashes the common secret, producing a 1024 byte long hash. _**K = hf(s, l)**_
+10. Bob deciphers the ciphertext message using the hashed common secret as a one-time pad. _**P = C ⊕ K**_
+11. Bob destroys the common secret and one-time pad.

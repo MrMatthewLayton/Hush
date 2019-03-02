@@ -56,24 +56,49 @@ Fundamentally, the proposed solution does not alter the implementation of the Ve
 
 ### Scenario
 
-Alice wants to send a private message to Bob over a public channel. _Assume that this message is 1KB (or 1024 bytes) long._
+Alice wants to send a private message to Bob over a public channel. Assume that the message length _**L**_ is 1024 bytes long.
 
 **Key Exchange (Diffie-Hellman)**
 
 1. Alice generates a public key and sends it to Bob.
 2. Bob generates a public key and sends it to Alice.
-3. Both Alice and Bob derive a common secret.
+3. Both Alice and Bob derive a common secret _**S**_.
 
 **Encryption (SHAKE-256 & Vernam cipher)**
 
-4. Alice hashes the common secret, producing a 1024 byte long hash. _**K = hf(s, l)**_
-5. Alice enciphers the plaintext message using the hashed common secret as a one-time pad. _**C = P ⊕ K**_
-6. Alice sends the ciphertext to Bob over a public channel.
-7. Alice destroys the common secret and one-time pad.
+4. Alice hashes _**H**_ the common secret _**S**_, producing a 1024 byte long hash _**K**_. 
+   _**K = H(S, L)**_
+5. Alice enciphers the plaintext message _**P**_ using the hashed common secret _**K**_ as a one-time pad. 
+   _**C = P ⊕ K**_
+6. Alice sends the ciphertext message _**C**_ to Bob over a public channel.
+7. Alice destroys the common secret _**S**_ and one-time pad _**K**_.
 
 **Decryption (SHAKE-256 & Vernam cipher)**
 
 8. Bob receives the ciphertext.
-9. Bob hashes the common secret, producing a 1024 byte long hash. _**K = hf(s, l)**_
-10. Bob deciphers the ciphertext message using the hashed common secret as a one-time pad. _**P = C ⊕ K**_
-11. Bob destroys the common secret and one-time pad.
+9. Bob hashes _**H**_ the common secret _**S**_, producing a 1024 byte long hash _**K**_. 
+   _**K = H(S, L)**_
+10. Bob deciphers the ciphertext message _**C**_ using the hashed common secret _**K**_ as a one-time pad. 
+    _**P = C ⊕ K**_
+11. Bob destroys the common secret _**S**_ and one-time pad _**K**_.
+
+## References
+
+[Diffie-Hellman Key Exchange (Wikipedia)](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange)
+
+[SHA-3 (Wikipedia)](https://en.wikipedia.org/wiki/SHA-3)
+
+[One-Time Pad (Wikipedia)](https://en.wikipedia.org/wiki/One-time_pad)
+
+[Gilbert Vernam (Wikipedia)](https://en.wikipedia.org/wiki/Gilbert_Vernam)
+
+[FIPS 180-4 Secure Hash Standard](https://csrc.nist.gov/publications/detail/fips/180/4/final)
+
+[FIPS 202 SHA-3 Standard](https://csrc.nist.gov/publications/detail/fips/202/final)
+
+## Author
+
+Matthew Layton (BSc Computer Science)
+
+matthew.layton@live.co.uk
+
